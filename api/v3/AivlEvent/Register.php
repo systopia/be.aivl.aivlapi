@@ -27,7 +27,29 @@ function civicrm_api3_aivl_event_register($params) {
   // resolve contact
   CRM_Aivlapi_Processor::resolveContact($params);
 
-  // now basically create a participant
+  // load the event
+  $event = civicrm_api3('Event', 'getsingle', array('id' => $params['event_id']));
+
+  // set some defaults
+  if (empty($params['role_id']) && !empty($event['default_role_id'])) {
+    $params['role_id'] = $event['default_role_id'];
+  }
+
+  // check if a participant already exists for this role
+  $existing_registrations = civicrm_api3('Participant', 'get', array(
+    'contact_id' => $params['contact_id'],
+    'event_id'   => $params['event_id'],
+  ));
+  if ($existing_registrations['count'] > 0) {
+    // TODO: use i3val:
+    // $existing_registration = reset($existing_registrations['values']);
+    // $params['id'] = $existing_registration['id'];
+    // civicrm_api3('Participant', 'request_update', $params);
+
+    throw new Exception("Contact already registered", 1);
+  }
+
+  // now basically just create a participant
   return civicrm_api3('Participant', 'create', $params);
 }
 
@@ -43,5 +65,10 @@ function _civicrm_api3_aivl_event_register_spec(&$params) {
     'name'         => 'event_id',
     'api.required' => 1,
     'title'        => 'Event to sign up to',
+    );
+  $params['role_id'] = array(
+    'name'         => 'role_id',
+    'api.required' => 0,
+    'title'        => 'Particpant Role',
     );
 }

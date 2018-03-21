@@ -12,7 +12,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-define('AIVLAPI_LOGGING', 1);
+define('AIVLAPI_LOGGING',          1);
+define('AIVLAPI_FALLBACK_USER_ID', 2);
 
 /**
  * Offers generic API processing functions
@@ -27,6 +28,9 @@ class CRM_Aivlapi_Processor {
     if (AIVLAPI_LOGGING) {
       CRM_Core_Error::debug_log_message("{$log_id}: " . json_encode($params));
     }
+
+    // undo REST related changes
+    CRM_Aivlapi_CustomData::unREST($params);
 
     // resolve any custom fields
     CRM_Aivlapi_CustomData::resolveCustomFields($params);
@@ -55,7 +59,7 @@ class CRM_Aivlapi_Processor {
       // Check and see if a valid secret API key is provided.
       $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
       if (!$api_key || strtolower($api_key) == 'null') {
-        $session->set('userID', 2);
+        $session->set('userID', AIVLAPI_FALLBACK_USER_ID);
       }
 
       $valid_user = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
