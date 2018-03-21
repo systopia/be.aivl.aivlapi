@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<extension key="be.aivl.aivlapi" type="module">
+  <file>aivlapi</file>
+  <name>AIVL Custom API</name>
+  <description>Offers public interfaces, e.g. webforms</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>SYSTOPIA</author>
+    <email>endres@systopia.de</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">https://github.com/systopia/be.aivl.aivlapi</url>
+    <url desc="Documentation">https://github.com/systopia/be.aivl.aivlapi</url>
+    <url desc="Support">https://github.com/systopia/be.aivl.aivlapi/issues</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2018-03-21</releaseDate>
+  <version>0.1</version>
+  <develStage>dev</develStage>
+  <compatibility>
+    <ver>4.6</ver>
+  </compatibility>
+  <comments></comments>
+  <civix>
+    <namespace>CRM/Aivlapi</namespace>
+  </civix>
+</extension>
