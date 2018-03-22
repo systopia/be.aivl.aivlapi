@@ -30,27 +30,61 @@ function civicrm_api3_aivl_event_register($params) {
   // load the event
   $event = civicrm_api3('Event', 'getsingle', array('id' => $params['event_id']));
 
+  // strip 'participant_' prefixes
+  $keys = array_keys($params);
+  foreach ($keys as $key) {
+    if (substr($key, 0, 12) == 'participant_') {
+      $new_key = substr($key, 12);
+      if (empty($params[$new_key])) {
+        $params[$new_key] = $params[$key];
+      }
+    }
+  }
+
   // set some defaults
   if (empty($params['role_id']) && !empty($event['default_role_id'])) {
     $params['role_id'] = $event['default_role_id'];
   }
 
-  // check if a participant already exists for this role
+  // see if a participant already exists for this contact/event
   $existing_registrations = civicrm_api3('Participant', 'get', array(
     'contact_id' => $params['contact_id'],
     'event_id'   => $params['event_id'],
+    'return'     => 'id,participant_role_id',
   ));
-  if ($existing_registrations['count'] > 0) {
-    // TODO: use i3val:
-    // $existing_registration = reset($existing_registrations['values']);
-    // $params['id'] = $existing_registration['id'];
-    // civicrm_api3('Participant', 'request_update', $params);
 
-    throw new Exception("Contact already registered", 1);
+
+  if ($existing_registrations['count'] > 0) {
+    // TODO: use i3val?
+    // for now: create activity
+    $registration = reset($existing_registrations['values']);
+    $params['participant_id'] = $registration['id'];
+    CRM_Aivlapi_Processor::stripTechnicalFields($params);
+
+    $details = CRM_Aivlapi_Processor::renderTemplate('Aivlapi/AivlEvent/RepeatedRegistration.tpl', array(
+      'contact_id'     => $params['contact_id'],
+      'participant_id' => $params['participant_id'],
+      'data'           => $params));
+    civicrm_api3('Activity', 'create', array(
+      'activity_type_id' => CRM_Aivlapi_Configuration::getRegistrationUpdateActivityID(),
+      'subject'          => 'Repeated Registration Submitted',
+      'target_id'        => $params['contact_id'],
+      'details'          => $details,
+      'status_id'        => 1, // scheduled
+    ));
+
+  } else {
+    // not there? => just create a participant object
+    $new_registration = civicrm_api3('Participant', 'create', $params);
+
+    // and re-load to get the status
+    $registration = civicrm_api3('Participant', 'getsingle', array(
+      'id'      => $new_registration['id'],
+      'return'  => 'id,role_id',
+    ));
   }
 
-  // now basically just create a participant
-  return civicrm_api3('Participant', 'create', $params);
+  return civicrm_api3_create_success($registration);
 }
 
 /**

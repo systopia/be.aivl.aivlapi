@@ -12,20 +12,19 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-define('AIVLAPI_LOGGING',          1);
-define('AIVLAPI_FALLBACK_USER_ID', 2);
-
 /**
  * Offers generic API processing functions
  */
 class CRM_Aivlapi_Processor {
+
+  private static $technical_fields = array('sequential', 'prettyprint', 'json', 'check_permissions', 'version');
 
   /**
    * generic preprocessor for every call
    */
   public static function preprocessCall(&$params, $log_id = 'n/a') {
     self::fixAPIUser();
-    if (AIVLAPI_LOGGING) {
+    if (CRM_Aivlapi_Configuration::logAPICalls()) {
       CRM_Core_Error::debug_log_message("{$log_id}: " . json_encode($params));
     }
 
@@ -34,6 +33,17 @@ class CRM_Aivlapi_Processor {
 
     // resolve any custom fields
     CRM_Aivlapi_CustomData::resolveCustomFields($params);
+  }
+
+  /**
+   * strip the technical API fields from the params
+   */
+  public static function stripTechnicalFields(&$params) {
+    foreach (self::$technical_fields as $field_name) {
+      if (isset($params[$field_name])) {
+        unset($params[$field_name]);
+      }
+    }
   }
 
   /**
@@ -59,7 +69,7 @@ class CRM_Aivlapi_Processor {
       // Check and see if a valid secret API key is provided.
       $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
       if (!$api_key || strtolower($api_key) == 'null') {
-        $session->set('userID', AIVLAPI_FALLBACK_USER_ID);
+        $session->set('userID', CRM_Aivlapi_Configuration::getFallbackUserID());
       }
 
       $valid_user = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
@@ -70,5 +80,37 @@ class CRM_Aivlapi_Processor {
         $session->set('userID', $valid_user);
       }
     }
+  }
+
+  /**
+   * Render the given template with the given data
+   */
+  public static function renderTemplate($template_path, $data) {
+    $smarty = CRM_Core_Smarty::singleton();
+
+    // first backup original variables, since smarty instance is a singleton
+    $oldVars = $smarty->get_template_vars();
+    $backupFrame = array();
+    foreach ($data as $key => $value) {
+      $key = str_replace(' ', '_', $key);
+      $backupFrame[$key] = isset($oldVars[$key]) ? $oldVars[$key] : NULL;
+    }
+
+    // then assign new variables
+    foreach ($data as $key => $value) {
+      $key = str_replace(' ', '_', $key);
+      $smarty->assign($key, $value);
+    }
+
+    // create result
+    $rendered_text =  $smarty->fetch($template_path);
+
+    // reset smarty variables
+    foreach ($backupFrame as $key => $value) {
+      $key = str_replace(' ', '_', $key);
+      $smarty->assign($key, $value);
+    }
+
+    return $rendered_text;
   }
 }
