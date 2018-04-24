@@ -19,6 +19,8 @@
 class CRM_Aivlapi_Configuration {
 
   protected static $registration_update_acvivity_id = NULL;
+  protected static $petition_signed_acvivity_id     = NULL;
+  protected static $domain_contact_id               = NULL;
 
 
   /**
@@ -35,6 +37,50 @@ class CRM_Aivlapi_Configuration {
   public static function getFallbackUserID() {
     // TODO: settings page?
     return 233477;
+  }
+
+  /**
+   * Get the AIVL Org contact ID
+   */
+  public static function getAivlContactID() {
+    if (self::$domain_contact_id === NULL) {
+      self::$domain_contact_id = civicrm_api3('Domain', 'getvalue', array(
+        'return'  => 'contact_id',
+        'options' => array('limit' => 1),
+      ));
+    }
+    return self::$domain_contact_id;
+  }
+
+  /**
+   * get the Partition Signed activity ID
+   */
+  public static function getPetitionActivityTypeID($create_if_not_found = TRUE) {
+    if (self::$petition_signed_acvivity_id === NULL) {
+      $search = civicrm_api3('OptionValue', 'get', array(
+        'check_permissions' => 0,
+        'option_group_id'   => 'activity_type',
+        'name'              => 'petition_signed',
+        'return'            => 'id,value'
+      ));
+      if (!empty($search['id'])) {
+        $activity_type = reset($search['values']);
+        self::$petition_signed_acvivity_id = $activity_type['value'];
+      } elseif ($create_if_not_found) {
+        $create = civicrm_api3('OptionValue', 'create', array(
+          'check_permissions' => 0,
+          'option_group_id'   => 'activity_type',
+          'name'              => 'petition_signed',
+          'label'             => 'Petition Signed',
+          'description'       => 'Activity Type used when petition form signed',
+          'is_reserved'       => 1,
+        ));
+        return self::getPetitionActivityTypeID(FALSE);
+      } else {
+        throw new Exception("Cannot find petition_signed activity type");
+      }
+    }
+    return self::$petition_signed_acvivity_id;
   }
 
   /**
