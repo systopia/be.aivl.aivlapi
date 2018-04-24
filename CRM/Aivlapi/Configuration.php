@@ -44,18 +44,22 @@ class CRM_Aivlapi_Configuration {
   public static function getRegistrationUpdateActivityID() {
     if (self::$registration_update_acvivity_id == NULL) {
       $activity_types = civicrm_api3('OptionValue', 'get', array(
-        'option_group_id' => 'activity_type',
-        'name'            => 'aivl_registration_update'
+        'check_permissions' => 0,
+        'option_group_id'   => 'activity_type',
+        'name'              => 'aivl_registration_update'
       ));
       if (empty($activity_types['count'])) {
         // not there yet -> create
         $activity_type = civicrm_api3('OptionValue', 'create', array(
-          'option_group_id' => 'activity_type',
-          'name'            => 'aivl_registration_update',
-          'label'           => 'AIVL Event Registration Update',
-          'is_active'       => 1,
+          'check_permissions' => 0,
+          'option_group_id'   => 'activity_type',
+          'name'              => 'aivl_registration_update',
+          'label'             => 'AIVL Event Registration Update',
+          'is_active'         => 1,
         ));
-        $activity_types = civicrm_api3('OptionValue', 'get', array('id' => $activity_type['id']));
+        $activity_types = civicrm_api3('OptionValue', 'get', array(
+          'check_permissions' => 0,
+          'id'                => $activity_type['id']));
       }
 
       $activity_type = reset($activity_types['values']);

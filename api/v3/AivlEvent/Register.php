@@ -28,7 +28,9 @@ function civicrm_api3_aivl_event_register($params) {
   CRM_Aivlapi_Processor::resolveContact($params);
 
   // load the event
-  $event = civicrm_api3('Event', 'getsingle', array('id' => $params['event_id']));
+  $event = civicrm_api3('Event', 'getsingle', array(
+    'id'                => $params['event_id'],
+    'check_permissions' => 0));
 
   // strip 'participant_' prefixes
   $keys = array_keys($params);
@@ -48,9 +50,10 @@ function civicrm_api3_aivl_event_register($params) {
 
   // see if a participant already exists for this contact/event
   $existing_registrations = civicrm_api3('Participant', 'get', array(
-    'contact_id' => $params['contact_id'],
-    'event_id'   => $params['event_id'],
-    'return'     => 'id,participant_role_id',
+    'check_permissions' => 0,
+    'contact_id'        => $params['contact_id'],
+    'event_id'          => $params['event_id'],
+    'return'            => 'id,participant_role_id',
   ));
 
 
@@ -66,21 +69,24 @@ function civicrm_api3_aivl_event_register($params) {
       'participant_id' => $params['participant_id'],
       'data'           => $params));
     civicrm_api3('Activity', 'create', array(
-      'activity_type_id' => CRM_Aivlapi_Configuration::getRegistrationUpdateActivityID(),
-      'subject'          => 'Repeated Registration Submitted',
-      'target_id'        => $params['contact_id'],
-      'details'          => $details,
-      'status_id'        => 1, // scheduled
+      'check_permissions' => 0,
+      'activity_type_id'  => CRM_Aivlapi_Configuration::getRegistrationUpdateActivityID(),
+      'subject'           => 'Repeated Registration Submitted',
+      'target_id'         => $params['contact_id'],
+      'details'           => $details,
+      'status_id'         => 1, // scheduled
     ));
 
   } else {
     // not there? => just create a participant object
+    $param['check_permissions'] = 0;
     $new_registration = civicrm_api3('Participant', 'create', $params);
 
     // and re-load to get the status
     $registration = civicrm_api3('Participant', 'getsingle', array(
-      'id'      => $new_registration['id'],
-      'return'  => 'id,role_id',
+      'check_permissions' => 0,
+      'id'                => $new_registration['id'],
+      'return'            => 'id,role_id',
     ));
   }
 

@@ -147,11 +147,18 @@ function aivlapi_civicrm_entityTypes(&$entityTypes) {
 }
 
 /**
+ * Define custom (Drupal) permissions
+ */
+function aivlapi_civicrm_permission(&$permissions) {
+  $permissions['access AIVL API'] = 'AIVL-API: access AIVL API';
+}
+
+
+/**
  * Set permissions for runner/engine API call
  */
 function aivlapi_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions) {
-  // TODO: to be reviewed
-
   // AivlEvent
-  $permissions['aivl_event']['register'] = array('edit event participants');
+  $permissions['aivl_event']['register'] = array('access AIVL API');
+  $permissions['aivl_petition']['sign']  = array('access AIVL API');
 }
