@@ -15,7 +15,7 @@
 /**
  * Process AivlEvent.register
  *
- * @param see specs below (_civicrm_api3_engage_signpetition_spec)
+ * @param see specs below
  * @return array API result array
  * @access public
  */
@@ -27,7 +27,9 @@ function civicrm_api3_aivl_petition_sign($params) {
   // resolve contact
   CRM_Aivlapi_Processor::resolveContact($params);
 
-  error_log("STEP 1");
+  // add to groups
+  CRM_Aivlapi_Processor::processGroupSignup($params);
+
   // create petition activity
   $activity_data = array(
     'check_permissions'  => 0,
@@ -39,7 +41,7 @@ function civicrm_api3_aivl_petition_sign($params) {
     // 'source_record_id'   => won't set, AIVL doesn't want this connection
     'campaign_id'        => (int) $params['campaign_id'],
   );
-  error_log("STEP 2");
+
   // add campaign title to subject
   $activity_data['subject'] = civicrm_api3('Campaign', 'getvalue', array(
     'check_permissions' => 0,
@@ -63,7 +65,6 @@ function civicrm_api3_aivl_petition_sign($params) {
           7 => array($activity_data['source_contact_id'], 'Integer'),
           8 => array($activity_data['target_contact_id'], 'Integer')));
 
-    error_log("STEP 3");
     if ($existing_activity_count > 0) {
       CRM_Core_Error::debug_log_message('Petition activity for contact '.$params['contact_id'].', campaign '
         .$params['campaign_id'].' already exists, not duplicated');

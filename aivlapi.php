@@ -161,4 +161,5 @@ function aivlapi_civicrm_alterAPIPermissions($entity, $action, &$params, &$permi
   // AivlEvent
   $permissions['aivl_event']['register'] = array('access AIVL API');
   $permissions['aivl_petition']['sign']  = array('access AIVL API');
+  $permissions['event']['get']           = array('access AIVL API');
 }

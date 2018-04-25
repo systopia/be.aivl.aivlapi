@@ -27,6 +27,9 @@ function civicrm_api3_aivl_event_register($params) {
   // resolve contact
   CRM_Aivlapi_Processor::resolveContact($params);
 
+  // add to groups
+  CRM_Aivlapi_Processor::processGroupSignup($params);
+
   // load the event
   $event = civicrm_api3('Event', 'getsingle', array(
     'id'                => $params['event_id'],

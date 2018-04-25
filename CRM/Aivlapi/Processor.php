@@ -57,6 +57,27 @@ class CRM_Aivlapi_Processor {
   }
 
   /**
+   * Sign contact up for a group if the two fields
+   *  add_to_group
+   *  add_to_group_id
+   * are not empty.
+   */
+  public static function processGroupSignup($params) {
+    if (   !empty($params['add_to_group'])
+        && !empty($params['add_to_group_id'])
+        && !empty($params['contact_id'])) {
+
+      $group_id = (int) $params['add_to_group_id'];
+      if ($group_id && !empty($params['contact_id'])) {
+        civicrm_api3('GroupContact', 'create', array(
+          'check_permissions' => 0,
+          'contact_id'        => $params['contact_id'],
+          'group_id'          => $group_id));
+      }
+    }
+  }
+
+  /**
    * Make sure the current user exists
    */
   public static function fixAPIUser() {
