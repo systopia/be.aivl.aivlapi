@@ -57,6 +57,31 @@ class CRM_Aivlapi_Processor {
   }
 
   /**
+   * Extract (and remove) all the data with a certain prefix.
+   * The prefix is stripped
+   *
+   * @param $prefix
+   * @param $data
+   *
+   * @return array the extracted data
+   */
+  public static function extractSubdata($prefix, &$data) {
+    $subdata = array();
+    $prefix_length = strlen($prefix);
+    $keys = array_keys($data);
+    foreach ($keys as $key) {
+      if (substr($key, 0, $prefix_length) == $prefix) {
+        // prefix matches! add to subdata
+        $subdata[substr($key, $prefix_length)] = $data[$key];
+
+        // ...and remove from data
+        unset($data[$key]);
+      }
+    }
+    return $subdata;
+  }
+
+  /**
    * Sign contact up for a group if the two fields
    *  add_to_group
    *  add_to_group_id
@@ -75,6 +100,72 @@ class CRM_Aivlapi_Processor {
           'group_id'          => $group_id));
       }
     }
+  }
+
+
+  /**
+   * Create a registration for the
+   * @param $participant  array participant data, potentially with extra data with 'participant_' prefix
+   * @param $event        array the event to register for
+   * @return array              registration result
+   * @throws CiviCRM_API3_Exception
+   */
+  public static function createParticipant($participant, $event) {
+    if (empty($contact_data)) {
+      return civicrm_api3_create_success();
+    }
+
+    // extract the 'participant_' data
+    $participant = CRM_Aivlapi_Processor::extractSubdata('participant_', $participant) + $participant;
+
+    // set some defaults
+    if (empty($participant['role_id']) && !empty($event['default_role_id'])) {
+      $participant['role_id'] = $event['default_role_id'];
+    }
+
+    // see if a participant already exists for this contact/event
+    $existing_registrations = civicrm_api3('Participant', 'get', array(
+        'check_permissions' => 0,
+        'contact_id'        => $participant['contact_id'],
+        'event_id'          => $event['id'],
+        'return'            => 'id,participant_role_id',
+    ));
+
+
+    if ($existing_registrations['count'] > 0) {
+      // TODO: use i3val?
+      // for now: create activity
+      $registration = reset($existing_registrations['values']);
+      $participant['participant_id'] = $registration['id'];
+      CRM_Aivlapi_Processor::stripTechnicalFields($participant);
+
+      $details = CRM_Aivlapi_Processor::renderTemplate('Aivlapi/AivlEvent/RepeatedRegistration.tpl', array(
+          'contact_id'     => $participant['contact_id'],
+          'participant_id' => $participant['participant_id'],
+          'data'           => $participant));
+      civicrm_api3('Activity', 'create', array(
+          'check_permissions' => 0,
+          'activity_type_id'  => CRM_Aivlapi_Configuration::getRegistrationUpdateActivityID(),
+          'subject'           => 'Repeated Registration Submitted',
+          'target_id'         => $participant['contact_id'],
+          'details'           => $details,
+          'status_id'         => 1, // scheduled
+      ));
+
+    } else {
+      // not there? => just create a participant object
+      $param['check_permissions'] = 0;
+      $new_registration = civicrm_api3('Participant', 'create', $participant);
+
+      // and re-load to get the status
+      $registration = civicrm_api3('Participant', 'getsingle', array(
+          'check_permissions' => 0,
+          'id'                => $new_registration['id'],
+          'return'            => 'id,role_id',
+      ));
+    }
+
+    return $registration;
   }
 
   /**
