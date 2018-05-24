@@ -47,7 +47,7 @@ class CRM_Aivlapi_EventProcessor {
 
     if ($existing_registrations['count'] > 0) {
       // check if the 'repeated registration' activty should be suppressed
-      if (empty('dont_create_repeated_registration')) {
+      if (empty($participant['dont_create_repeated_registration'])) {
         // TODO: use i3val?
         // for now: create activity
         $registration = reset($existing_registrations['values']);
