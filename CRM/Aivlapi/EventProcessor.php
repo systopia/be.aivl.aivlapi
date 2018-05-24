@@ -46,24 +46,27 @@ class CRM_Aivlapi_EventProcessor {
     ));
 
     if ($existing_registrations['count'] > 0) {
-      // TODO: use i3val?
-      // for now: create activity
-      $registration = reset($existing_registrations['values']);
-      $participant['participant_id'] = $registration['id'];
-      CRM_Aivlapi_Processor::stripTechnicalFields($participant);
+      // check if the 'repeated registration' activty should be suppressed
+      if (!empty('dont_create_repeated_registration')) {
+        // TODO: use i3val?
+        // for now: create activity
+        $registration = reset($existing_registrations['values']);
+        $participant['participant_id'] = $registration['id'];
+        CRM_Aivlapi_Processor::stripTechnicalFields($participant);
 
-      $details = CRM_Aivlapi_Processor::renderTemplate('Aivlapi/AivlEvent/RepeatedRegistration.tpl', array(
-          'contact_id'     => $participant['contact_id'],
-          'participant_id' => $participant['participant_id'],
-          'data'           => $participant));
-      civicrm_api3('Activity', 'create', array(
-          'check_permissions' => 0,
-          'activity_type_id'  => CRM_Aivlapi_Configuration::getRegistrationUpdateActivityID(),
-          'subject'           => 'Repeated Registration Submitted',
-          'target_id'         => $participant['contact_id'],
-          'details'           => $details,
-          'status_id'         => 1, // scheduled
-      ));
+        $details = CRM_Aivlapi_Processor::renderTemplate('Aivlapi/AivlEvent/RepeatedRegistration.tpl', array(
+            'contact_id'     => $participant['contact_id'],
+            'participant_id' => $participant['participant_id'],
+            'data'           => $participant));
+        civicrm_api3('Activity', 'create', array(
+            'check_permissions' => 0,
+            'activity_type_id'  => CRM_Aivlapi_Configuration::getRegistrationUpdateActivityID(),
+            'subject'           => 'Repeated Registration Submitted',
+            'target_id'         => $participant['contact_id'],
+            'details'           => $details,
+            'status_id'         => 1, // scheduled
+        ));
+      }
 
     } else {
       // not there? => just create a participant object
