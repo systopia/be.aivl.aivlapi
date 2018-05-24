@@ -43,6 +43,6 @@ class CRM_Aivlapi_ActivityProcessor {
       $activity_data['activity_date_time'] = date('YmdHis');
     }
 
-    return civicrm_api3('Activty', 'create', $activity_data);
+    return civicrm_api3('Activity', 'create', $activity_data);
   }
 }

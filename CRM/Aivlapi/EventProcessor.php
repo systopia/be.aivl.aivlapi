@@ -25,7 +25,7 @@ class CRM_Aivlapi_EventProcessor {
    * @throws CiviCRM_API3_Exception
    */
   public static function createParticipant($participant, $event) {
-    if (empty($contact_data)) {
+    if (empty($participant)) {
       return civicrm_api3_create_success();
     }
 
@@ -44,7 +44,6 @@ class CRM_Aivlapi_EventProcessor {
         'event_id'          => $event['id'],
         'return'            => 'id,participant_role_id',
     ));
-
 
     if ($existing_registrations['count'] > 0) {
       // TODO: use i3val?
@@ -68,7 +67,8 @@ class CRM_Aivlapi_EventProcessor {
 
     } else {
       // not there? => just create a participant object
-      $param['check_permissions'] = 0;
+      $participant['check_permissions'] = 0;
+      $participant['event_id'] = $event['id'];
       $new_registration = civicrm_api3('Participant', 'create', $participant);
 
       // and re-load to get the status
