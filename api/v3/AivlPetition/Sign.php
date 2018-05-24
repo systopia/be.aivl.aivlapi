@@ -44,11 +44,11 @@ function civicrm_api3_aivl_petition_sign($params) {
 
   // extract campaign_ids:
   $campaign_ids = array();
-  if (!empty($activity_data['campaign_id'])) {
-    $campaign_ids[] = $activity_data['campaign_id'];
+  if (!empty($params['campaign_id'])) {
+    $campaign_ids[] = $params['campaign_id'];
   }
   // extract from campaign_xx fields
-  foreach ($activity_data as $key => $value) {
+  foreach ($params as $key => $value) {
     if (preg_match("#^campaign_(?P<campaign_id>[0-9]+)$#", $key, $match)) {
       if (!empty($value)) {
         $campaign_ids[] = $match['campaign_id'];
