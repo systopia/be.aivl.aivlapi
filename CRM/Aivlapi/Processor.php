@@ -78,6 +78,13 @@ class CRM_Aivlapi_Processor {
         unset($data[$key]);
       }
     }
+
+    // undo REST related changes
+    CRM_Aivlapi_CustomData::unREST($subdata);
+
+    // resolve any custom fields
+    CRM_Aivlapi_CustomData::resolveCustomFields($subdata);
+
     return $subdata;
   }
 
