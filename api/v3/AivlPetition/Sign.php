@@ -109,7 +109,7 @@ function civicrm_api3_aivl_petition_sign($params) {
 function _civicrm_api3_aivl_petition_sign_spec(&$params) {
   $params['campaign_id'] = array(
     'name'         => 'campaign_id',
-    'api.required' => 1,
+    'api.required' => 0,
     'title'        => 'Campaign ',
     );
 }
