@@ -77,9 +77,9 @@ class CRM_Aivlapi_RelationshipProcessor {
     $relationship_data['check_permissions'] = 0;
     $relationship_data['contact_id_a']      = $contactA['contact_id'];
     $relationship_data['contact_id_b']      = $contactB['contact_id'];
+    $relationship_data['start_date']        = date('YmdHis');
     if ($new_end_date) {
-      $relationship_data['end_date']   = $new_end_date;
-      $relationship_data['start_date'] = date('YmdHis');
+      $relationship_data['end_date'] = $new_end_date;
     }
     civicrm_api3('Relationship', 'create', $relationship_data);
   }
