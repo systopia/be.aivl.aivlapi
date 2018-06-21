@@ -16,6 +16,16 @@ require_once 'aivlapi.civix.php';
 use CRM_Aivlapi_ExtensionUtil as E;
 
 /**
+ * Implements hook_civicrm_apiWrappers for filtering
+ * @see https://civicoop.plan.io/issues/2906
+ */
+function aivlapi_civicrm_apiWrappers(&$wrappers, $apiRequest) {
+  if (!empty($apiRequest['params']['drop_questionmarks'])) {
+    $wrappers[] = new CRM_Aivlapi_ParameterSanitation();
+  }
+}
+
+/**
  * Implements hook_civicrm_config().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
