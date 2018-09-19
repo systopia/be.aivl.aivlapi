@@ -51,7 +51,7 @@ class CRM_Aivlapi_MailProcessor {
         'id'                => array('IN' => $contact_ids),
         'option.limit'      => 0,
         'is_deleted'        => 0,
-        'return'            => 'id,display_name'));
+        'return'            => 'id,display_name,is_opt_out'));
     foreach ($contact_query['values'] as $contact) {
       $contacts[] = $contact;
     }
