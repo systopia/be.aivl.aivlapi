@@ -71,6 +71,9 @@ class CRM_Aivlapi_Processor {
    */
   public static function resolveContact(&$params) {
     $params['check_permissions'] = 0;
+    if (empty($params['contact_type'])) {
+      $params['contact_type'] = 'Individual';
+    }
     $contact_match = civicrm_api3('Contact', 'getorcreate', $params);
     $params['contact_id'] = $contact_match['id'];
   }

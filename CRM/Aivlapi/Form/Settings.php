@@ -37,10 +37,27 @@ class CRM_Aivlapi_Form_Settings extends CRM_Core_Form {
         TRUE
     );
 
+
+    $this->add(
+        'select',
+        'membership_type_id',
+        E::ts('Membership Type'),
+        $this->getList('MembershipType', 'id', 'name'),
+        TRUE
+    );
+
     $this->add(
         'select',
         'membership_error_activity_type_id',
         E::ts('Membership Error Activity'),
+        $this->getList('OptionValue', 'value', 'label', ['option_group_id' => 'activity_type']),
+        TRUE
+    );
+
+    $this->add(
+        'select',
+        'membership_signoflive_activity_type_id',
+        E::ts('Membership Sign-of-Live Activity'),
         $this->getList('OptionValue', 'value', 'label', ['option_group_id' => 'activity_type']),
         TRUE
     );

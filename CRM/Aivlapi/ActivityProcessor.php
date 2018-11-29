@@ -59,14 +59,14 @@ class CRM_Aivlapi_ActivityProcessor {
    *
    * @throws CiviCRM_API3_Exception
    */
-  public static function createErrorActivity($contact_id, $activity_type_id, $subject, $assignee_id = NULL, $details = NULL) {
+  public static function createFullActivity($contact_id, $activity_type_id, $subject, $status_id = 'Completed', $assignee_id = NULL, $details = NULL) {
     $activity_data = [
         'check_permissions' => 0,
         'activity_type_id'  => $activity_type_id,
         'target_contact_id' => $contact_id,
         'subject'           => $subject,
         'details'           => $details,
-        'status_id'         => 'Scheduled',
+        'status_id'         => $status_id,
     ];
 
     if ($assignee_id) {
