@@ -45,4 +45,38 @@ class CRM_Aivlapi_ActivityProcessor {
 
     return civicrm_api3('Activity', 'create', $activity_data);
   }
+
+
+  /**
+   * Create an activity in status Pending
+   *
+   * @param $contact_id
+   * @param $activity_type_id
+   * @param $subject
+   * @param null $assignee_id
+   * @param string $details
+   * @return array activity data
+   *
+   * @throws CiviCRM_API3_Exception
+   */
+  public static function createErrorActivity($contact_id, $activity_type_id, $subject, $assignee_id = NULL, $details = NULL) {
+    $activity_data = [
+        'check_permissions' => 0,
+        'activity_type_id'  => $activity_type_id,
+        'target_contact_id' => $contact_id,
+        'subject'           => $subject,
+        'details'           => $details,
+        'status_id'         => 'Scheduled',
+    ];
+
+    if ($assignee_id) {
+      $activity_data['assignee_id'] = $assignee_id;
+    }
+
+    if ($details) {
+      $activity_data['details'] = $details;
+    }
+
+    return civicrm_api3('Activity', 'create', $activity_data);
+  }
 }

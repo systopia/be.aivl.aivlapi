@@ -13,26 +13,25 @@
 +--------------------------------------------------------*/
 
 /**
- * Process AivlMembership.feedback (see AIVL-3690)
+ * Process AivlSelfservice.contactdata (see AIVL-3486):
+ *
+ *  Update contact's data using XCM/I3Val
  *
  * @param see specs below (_civicrm_api3_engage_signpetition_spec)
  * @return array API result array
  * @access public
  */
-function civicrm_api3_aivl_membership_feedback($params) {
+function civicrm_api3_aivl_selfservice_contactdata($params) {
+  if (!empty($params['contact_id'])) {
+    // contact_id is given -> just call I3Val
+    $params['id'] = (int) $params['contact_id'];
+    $params['check_permissions'] = 0;
+    return civicrm_api3('Contact', 'request_update', $params);
 
-  // preprocess incoming call
-  CRM_Aivlapi_Processor::preprocessCall($params, 'AivlMembership.feedback');
-
-  switch ($params['feedback']) {
-    case 'extend':
-      return CRM_Aivlapi_MembershipProcessor::extendMembership($params);
-
-    case 'stop':
-      return CRM_Aivlapi_MembershipProcessor::stopMembership($params);
-
-    default:
-      return civicrm_api3_create_error("Unknown feedback '{$params['feedback']}'!");
+  } else {
+    // contact was NOT identified - maybe just run through XCM and then through I3Val
+    $params['id'] = CRM_Aivlapi_Processor::getContactID($params);
+    return civicrm_api3('Contact', 'request_update', $params);
   }
 }
 
@@ -42,14 +41,8 @@ function civicrm_api3_aivl_membership_feedback($params) {
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */
-function _civicrm_api3_aivl_membership_feedback_spec(&$params) {
+function _civicrm_api3_aivl_selfservice_contactdata_spec(&$params) {
   // CONTACT BASE
-  $params['feedback'] = array(
-      'name'         => 'feedback',
-      'api.required' => 1,
-      'title'        => 'Feedback type',
-      'description'  => 'expects "extend" or "stop"',
-  );
   $params['contact_id'] = array(
       'name'         => 'contact_id',
       'api.required' => 0,
@@ -70,5 +63,10 @@ function _civicrm_api3_aivl_membership_feedback_spec(&$params) {
       'name'         => 'last_name',
       'api.required' => 0,
       'title'        => 'Last Name',
+  );
+  $params['birth_date'] = array(
+      'name'         => 'birth_date',
+      'api.required' => 0,
+      'title'        => 'Birth Date',
   );
 }
