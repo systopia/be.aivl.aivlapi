@@ -63,7 +63,12 @@ class CRM_Aivlapi_MembershipProcessor {
       }
 
       // sign the contact up for any petitions
-      // TODO
+      $result = CRM_Aivlapi_PetitionProcessor::signPetitions($params);
+      if (empty($result['error'])) {
+        CRM_Core_Error::debug_log_message("'AivlMembership.feedback': Signed {$result['counter_signed']} petitions, {$result['counter_already']} were already signed.");
+      } else {
+        CRM_Core_Error::debug_log_message("'AivlMembership.feedback': {$result['error']}");
+      }
 
       // apply the contact changes
       if ($passed_contact_id) {
