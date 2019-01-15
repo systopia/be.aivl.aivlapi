@@ -124,6 +124,7 @@ class CRM_Aivlapi_Form_Settings extends CRM_Core_Form {
   protected function getList($entity, $id_field = 'id', $label_field = 'name', $params = []) {
     $list = [];
     $params['return'] = "{$id_field},{$label_field}";
+    $params['option.limit'] = 0;
     $results = civicrm_api3($entity, 'get', $params);
     foreach ($results['values'] as $key => $entry) {
       $list[$entry[$id_field]] = $entry[$label_field];
