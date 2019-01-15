@@ -18,25 +18,43 @@
  */
 class CRM_Aivlapi_Configuration {
 
+  // generic configuration
+  protected static $configuration                   = NULL;
+
   protected static $registration_update_acvivity_id = NULL;
   protected static $petition_signed_acvivity_id     = NULL;
   protected static $domain_contact_id               = NULL;
 
 
   /**
+   * Get a setting
+   *
+   * @param $name
+   * @param null $default
+   *
+   * @return mixed
+   */
+  public static function getSetting($name, $default = NULL) {
+    if (self::$configuration === NULL) {
+      self::$configuration = CRM_Core_BAO_Setting::getItem('be.aivl.aivlapi', 'aivlapi_config');
+    }
+
+    return CRM_Utils_Array::value($name, self::$configuration, $default);
+  }
+
+
+  /**
    * If the system fails to detect the user this ID will be used
    */
   public static function logAPICalls() {
-    // TODO: settings page?
-    return TRUE;
+    return self::getSetting('debug', FALSE);
   }
 
   /**
    * If the system fails to detect the user this ID will be used
    */
   public static function getFallbackUserID() {
-    // TODO: settings page?
-    return 233477;
+    return self::getSetting('fallback_contact_id', 2);
   }
 
   /**

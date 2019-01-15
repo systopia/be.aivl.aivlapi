@@ -47,11 +47,33 @@ class CRM_Aivlapi_Processor {
   }
 
   /**
+   * Get the contact ID:
+   *  if contact_id is given, great!
+   *  if not, use XCM/resolveContact to find/create it
+   *
+   * @param $params array parameters
+   * @return int contact ID
+   */
+  public static function getContactID(&$params) {
+    // if the contact_id is given, we will take that
+    if (!empty($params['contact_id'])) {
+      return $params['contact_id'];
+    }
+
+    // otherwise, use XCM
+    CRM_Aivlapi_Processor::resolveContact($params);
+    return $params['contact_id'];
+  }
+
+  /**
    * will use XCM to resolve the contact and add it as
    *  'contact_id' parameter in the params array
    */
   public static function resolveContact(&$params) {
     $params['check_permissions'] = 0;
+    if (empty($params['contact_type'])) {
+      $params['contact_type'] = 'Individual';
+    }
     $contact_match = civicrm_api3('Contact', 'getorcreate', $params);
     $params['contact_id'] = $contact_match['id'];
   }
@@ -232,4 +254,5 @@ class CRM_Aivlapi_Processor {
 
     return $rendered_text;
   }
+
 }

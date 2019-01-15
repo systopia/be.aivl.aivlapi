@@ -169,9 +169,10 @@ function aivlapi_civicrm_permission(&$permissions) {
  */
 function aivlapi_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions) {
   // new AivlEvent calls: simply use 'access AIVL API' permission
-  $permissions['aivl_event']['register'] = array('access AIVL API');
-  $permissions['aivl_petition']['sign']  = array('access AIVL API');
-  $permissions['aivl_mail']['optout']    = array('access AIVL API');
+  $permissions['aivl_event']['register']      = array('access AIVL API');
+  $permissions['aivl_petition']['sign']       = array('access AIVL API');
+  $permissions['aivl_mail']['optout']         = array('access AIVL API');
+  $permissions['aivl_membership']['feedback'] = array('access AIVL API');
 
   // open these calls up to "OR 'access AIVL API'":
   $permissions['event']['get'] = array($permissions['event']['get'], 'access AIVL API');
