@@ -27,10 +27,16 @@ function civicrm_api3_aivl_selfservice_contactbyhash($params) {
 
   if (!empty($params['hash'])) {
     try {
-      return civicrm_api3('Contact', 'getsingle', [
-          'hash' => $params['hash'],
+      // compile query
+      $query = [
+          'hash'              => $params['hash'],
           'check_permissions' => 0,
-      ]);
+      ];
+      if (!empty($params['return'])) {
+        $query['return'] = $params['return'];
+      }
+
+      return civicrm_api3('Contact', 'getsingle', $query);
     } catch (CiviCRM_API3_Exception $ex) {
       // not found
       return civicrm_api3_create_error("Not found");
