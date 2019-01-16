@@ -22,6 +22,9 @@
  * @access public
  */
 function civicrm_api3_aivl_selfservice_contactdata($params) {
+  // preprocess incoming call
+  CRM_Aivlapi_Processor::preprocessCall($params, 'Selfservice.contactdata');
+
   if (!empty($params['contact_id'])) {
     // contact_id is given -> just call I3Val
     $params['id'] = (int) $params['contact_id'];

@@ -22,6 +22,9 @@
  * @access public
  */
 function civicrm_api3_aivl_selfservice_contactbyhash($params) {
+  // preprocess incoming call
+  CRM_Aivlapi_Processor::preprocessCall($params, 'Selfservice.contactbyhash');
+
   if (!empty($params['hash'])) {
     try {
       return civicrm_api3('Contact', 'getsingle', [
