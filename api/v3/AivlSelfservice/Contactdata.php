@@ -31,6 +31,7 @@ function civicrm_api3_aivl_selfservice_contactdata($params) {
   } else {
     // contact was NOT identified - maybe just run through XCM and then through I3Val
     $params['id'] = CRM_Aivlapi_Processor::getContactID($params);
+    $params['check_permissions'] = 0;
     return civicrm_api3('Contact', 'request_update', $params);
   }
 }
@@ -43,11 +44,11 @@ function civicrm_api3_aivl_selfservice_contactdata($params) {
  */
 function _civicrm_api3_aivl_selfservice_contactdata_spec(&$params) {
   // CONTACT BASE
-  $params['contact_id'] = array(
-      'name'         => 'contact_id',
+  $params['hash'] = array(
+      'name'         => 'hash',
       'api.required' => 0,
-      'title'        => 'Contact ID',
-      'description'  => 'if given, will trigger updates',
+      'title'        => 'Contact Hash',
+      'description'  => 'If given, triggers update',
   );
   $params['email'] = array(
     'name'           => 'email',
