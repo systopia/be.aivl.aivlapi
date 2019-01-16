@@ -27,9 +27,9 @@ class CRM_Aivlapi_PetitionProcessor {
    * @throws CiviCRM_API3_Exception
    */
   public static function signPetitions($params) {
-    if (CRM_Aivlapi_Configuration::logAPICalls()) {
+    /*if (CRM_Aivlapi_Configuration::logAPICalls()) {
       CRM_Core_Error::debug_log_message("AivlAPI::signPetitions: " . json_encode($params));
-    }
+    }*/
 
     if (empty($params['contact_id'])) {
       // there's nobody to sign up..
@@ -56,7 +56,8 @@ class CRM_Aivlapi_PetitionProcessor {
     // extract from campaign_xx fields
     foreach ($params as $key => $value) {
       if (preg_match("#^campaign_(?P<campaign_id>[0-9]+)$#", $key, $match)) {
-        if (!empty($value)) {
+        $petition_requested = self::isPetitionRequested($value);
+        if ($petition_requested) {
           $campaign_ids[] = $match['campaign_id'];
         }
       }
@@ -107,5 +108,30 @@ class CRM_Aivlapi_PetitionProcessor {
         'counter_already' => $counter_already,
         'counter_signed'  => $counter_signed
     );
+  }
+
+  /**
+   * Determines whether the given value (submitted as campaign_XXX) should be
+   *  regarded as "YES"
+   */
+  private function isPetitionRequested($value) {
+    if (empty($value)) {
+      return FALSE;
+    }
+
+    if (is_array($value)) {
+      // see if one of the entries is not empty
+      foreach ($value as $sub_value) {
+        if (!empty($sub_value)) {
+          return TRUE;
+        }
+      }
+
+      // all values in the array are empty, that's a "no"
+      return FALSE;
+    }
+
+    // non-empty non-array -> that's a YES
+    return TRUE;
   }
 }
