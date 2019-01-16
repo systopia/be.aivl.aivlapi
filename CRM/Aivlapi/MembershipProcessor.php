@@ -34,28 +34,9 @@ class CRM_Aivlapi_MembershipProcessor {
   public static function extendMembership($params) {
     $passed_contact_id = empty($params['contact_id']) ? NULL : $params['contact_id'];
     $contact_id = CRM_Aivlapi_Processor::getContactID($params);
-    $membership = self::getMembership($contact_id);
 
-    if ($membership) {
-      // extend the membership by one year:
-      //  calculate end date (last day of the month)
-      $end_date = strtotime($membership['end_date']);          // parse current end date
-      if ($end_date < strtotime('now')) {
-        // only extend, if it's in the past
-        $end_date = strtotime("+1 year", $end_date);        // add one year
-        $end_date = strtotime("+1 month", $end_date);       // move to the next month
-        $end_date = strtotime(date('Y-m-01', $end_date)); // move to the FRIST of next month
-        $end_date = strtotime("-1 day", $end_date);         // back one day => result: last day of that month
-
-        // update the membership
-        civicrm_api3('Membership', 'create', [
-            'id'                 => $membership['id'],
-            'end_date'           => date('Ymd', $end_date),
-            'membership_type_id' => $membership['membership_type_id'],
-            'contact_id'         => $membership['contact_id']
-        ]);
-      }
-
+    // first, perform some minor tasks
+    try {
       // create a "Sign of Life" (tbd) activity
       $activity_type_id = CRM_Aivlapi_Configuration::getSetting('membership_signoflive_activity_type_id');
       if ($activity_type_id) {
@@ -74,6 +55,31 @@ class CRM_Aivlapi_MembershipProcessor {
       if ($passed_contact_id) {
         $params['id'] = $passed_contact_id;
         civicrm_api3('Contact', 'request_update', $params);
+      }
+    } catch (Exception $ex) {
+      CRM_Core_Error::debug_log_message("'AivlMembership.feedback': Error: " . $ex->getMessage());
+    }
+
+    // NOW: for the membership:
+    $membership = self::getMembership($contact_id);
+    if ($membership) {
+      // extend the membership by one year:
+      //  calculate end date (last day of the month)
+      $end_date = strtotime($membership['end_date']);          // parse current end date
+      if ($end_date < strtotime('now')) {
+        // only extend, if it's in the past
+        $end_date = strtotime("+1 year", $end_date);        // add one year
+        $end_date = strtotime("+1 month", $end_date);       // move to the next month
+        $end_date = strtotime(date('Y-m-01', $end_date)); // move to the FRIST of next month
+        $end_date = strtotime("-1 day", $end_date);         // back one day => result: last day of that month
+
+        // update the membership
+        civicrm_api3('Membership', 'create', [
+            'id'                 => $membership['id'],
+            'end_date'           => date('Ymd', $end_date),
+            'membership_type_id' => $membership['membership_type_id'],
+            'contact_id'         => $membership['contact_id']
+        ]);
       }
 
     } else {

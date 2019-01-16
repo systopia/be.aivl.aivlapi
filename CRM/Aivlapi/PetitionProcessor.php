@@ -27,6 +27,10 @@ class CRM_Aivlapi_PetitionProcessor {
    * @throws CiviCRM_API3_Exception
    */
   public static function signPetitions($params) {
+    if (CRM_Aivlapi_Configuration::logAPICalls()) {
+      CRM_Core_Error::debug_log_message("AivlAPI::signPetitions: " . json_encode($params));
+    }
+
     if (empty($params['contact_id'])) {
       // there's nobody to sign up..
       return array('error'  => 'No contact identified');
