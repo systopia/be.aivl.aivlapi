@@ -41,7 +41,7 @@ class CRM_Aivlapi_PetitionProcessor {
         'check_permissions'  => 0,
         'source_contact_id'  => CRM_Aivlapi_Configuration::getAivlContactID(),
         'activity_type_id'   => CRM_Aivlapi_Configuration::getPetitionActivityTypeID(),
-        'status_id'          => CRM_Core_OptionGroup::getValue('activity_status', 'Completed'),
+        'status_id'          => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
         'target_contact_id'  => $params['contact_id'],
         'activity_date_time' => date('Y-m-d H:i:s'),
         // 'source_record_id'   => won't set, AIVL doesn't want this connection

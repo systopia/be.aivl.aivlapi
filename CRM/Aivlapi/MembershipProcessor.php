@@ -54,6 +54,7 @@ class CRM_Aivlapi_MembershipProcessor {
       // apply the contact changes
       if ($passed_contact_id) {
         $params['id'] = $passed_contact_id;
+        $params['check_permissions'] = 0;
         civicrm_api3('Contact', 'request_update', $params);
       }
     } catch (Exception $ex) {
