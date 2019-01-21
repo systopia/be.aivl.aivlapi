@@ -87,10 +87,10 @@ class CRM_Aivlapi_Form_Settings extends CRM_Core_Form {
       ),
     ));
 
-    // export form elements
-    $this->assign('elementNames', $this->getRenderableElementNames());
-
     $current_values = CRM_Core_BAO_Setting::getItem('be.aivl.aivlapi', 'aivlapi_config');
+    if (isset($current_values['qfKey'])) {
+      unset($current_values['qfKey']);
+    }
     $this->setDefaults($current_values);
 
     parent::buildQuickForm();
@@ -100,23 +100,6 @@ class CRM_Aivlapi_Form_Settings extends CRM_Core_Form {
     $values = $this->exportValues();
     CRM_Core_BAO_Setting::setItem($values,'be.aivl.aivlapi', 'aivlapi_config');
     parent::postProcess();
-  }
-
-  /**
-   * Get the fields/elements defined in this form.
-   *
-   * @return array (string)
-   */
-  public function getRenderableElementNames() {
-    $elementNames = array();
-    foreach ($this->_elements as $element) {
-      /** @var HTML_QuickForm_Element $element */
-      $label = $element->getLabel();
-      if (!empty($label)) {
-        $elementNames[] = $element->getName();
-      }
-    }
-    return $elementNames;
   }
 
   /**
