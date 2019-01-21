@@ -40,7 +40,11 @@ class CRM_Aivlapi_MembershipProcessor {
       // create a "Sign of Life" (tbd) activity
       $activity_type_id = CRM_Aivlapi_Configuration::getSetting('membership_signoflive_activity_type_id');
       if ($activity_type_id) {
-        CRM_Aivlapi_ActivityProcessor::createFullActivity($contact_id, $activity_type_id, "Sign of Life");
+        $subject = CRM_Aivlapi_Configuration::getSetting('membership_signoflive_activity_subject');
+        if (empty($subject)) {
+          $subject = "Ik blijf lid";
+        }
+        CRM_Aivlapi_ActivityProcessor::createFullActivity($contact_id, $activity_type_id, $subject);
       }
 
       // sign the contact up for any petitions

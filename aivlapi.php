@@ -179,3 +179,20 @@ function aivlapi_civicrm_alterAPIPermissions($entity, $action, &$params, &$permi
   // open these calls up to "OR 'access AIVL API'":
   $permissions['event']['get'] = array($permissions['event']['get'], 'access AIVL API');
 }
+
+/**
+ * Implements hook_civicrm_navigationMenu().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
+ */
+function aivlapi_civicrm_navigationMenu(&$menu) {
+  _aivlapi_civix_insert_navigation_menu($menu, 'Administer/System Settings', array(
+      'label'      => E::ts('AIVL API Configuration'),
+      'name'       => 'aivlapi_configuration',
+      'url'        => 'civicrm/admin/setting/aivlapi',
+      'permission' => 'administer CiviCRM',
+      'operator'   => 'OR',
+      'separator'  => 0,
+  ));
+  _aivlapi_civix_navigationMenu($menu);
+}
