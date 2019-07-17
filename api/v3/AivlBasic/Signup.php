@@ -31,7 +31,7 @@ function _civicrm_api3_aivl_basic_signup_spec(&$spec) {
     'api.required' => 0,
     'type' => CRM_Utils_Type::T_STRING,
   ];
-  $spec['email'] = [
+  $spec['birth_date'] = [
     'name' => 'birth_date',
     'title' => E::ts('Date of Birth'),
     'description' => E::ts('Date of Birth'),

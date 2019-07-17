@@ -21,6 +21,10 @@
     <ver>4.6</ver>
     <ver>5.5</ver>
   </compatibility>
+  <requires>
+    <ext>de.systopia.xcm</ext>
+    <ext>be.aivl.basicsignup</ext>
+  </requires>
   <comments></comments>
   <civix>
     <namespace>CRM/Aivlapi</namespace>
