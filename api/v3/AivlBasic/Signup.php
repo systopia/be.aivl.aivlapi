@@ -67,7 +67,7 @@ function civicrm_api3_aivl_basic_signup($params) {
   $result = CRM_Aivlapi_BasicSignupProcessor::basicSignup($params);
   // handle errors
   if (!empty($result['error'])) {
-    Civi::log()->debug(E::ts("'AivlPetition.sign': {$result['error']}"));
+    Civi::log()->warning(E::ts("'AivlPetition.sign': {$result['error']}"));
     return civicrm_api3_create_error(E::ts("Error while doing a basic signup: {$result['error']}"));
   }
   // return results

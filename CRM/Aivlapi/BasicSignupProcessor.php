@@ -133,11 +133,11 @@ class CRM_Aivlapi_BasicSignupProcessor {
     $existingActivityCount = CRM_Core_DAO::singleValueQuery($query, $queryParams);
     if ($existingActivityCount > 0) {
       if (isset($activityData['campaign_id'])) {
-        Civi::log()->debug(E::ts('Webform Signup activity for contact ' . $activityData['target_contact_id'] . ', campaign '
+        Civi::log()->info(E::ts('Webform Signup activity for contact ' . $activityData['target_contact_id'] . ', campaign '
           . $activityData['campaign_id'] . ' already exists, not duplicated'));
       }
       else {
-        Civi::log()->debug(E::ts('Webform Signup activity for contact ' . $activityData['target_contact_id'] .
+        Civi::log()->info(E::ts('Webform Signup activity for contact ' . $activityData['target_contact_id'] .
           ' already exists, not duplicated'));
       }
       return TRUE;
