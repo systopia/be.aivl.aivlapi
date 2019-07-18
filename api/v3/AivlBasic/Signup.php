@@ -38,6 +38,13 @@ function _civicrm_api3_aivl_basic_signup_spec(&$spec) {
     'api.required' => 0,
     'type' => CRM_Utils_Type::T_DATE,
   ];
+  $spec['aivl_signup_source'] = [
+    'name' => 'aivl_signup_source',
+    'title' => E::ts('Webform Signup Source'),
+    'description' => E::ts('The webform source of the signup, for example Briefschrijver'),
+    'api.required' => 0,
+    'type' => CRM_Utils_Type::T_STRING,
+  ];
 }
 
 /**
