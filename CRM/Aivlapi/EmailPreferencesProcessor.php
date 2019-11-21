@@ -189,7 +189,7 @@ class CRM_Aivlapi_EmailPreferencesProcessor {
    */
   private function sanitizeSetParams(&$params) {
     foreach ($params as $paramKey => $paramValue) {
-      if (is_array($paramValue)) {
+      if (is_array($paramValue) && isset($paramValue[0])) {
         $params[$paramKey] = $paramValue[0];
       }
     }
