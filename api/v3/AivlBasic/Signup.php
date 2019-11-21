@@ -67,9 +67,14 @@ function civicrm_api3_aivl_basic_signup($params) {
   $result = CRM_Aivlapi_BasicSignupProcessor::basicSignup($params);
   // handle errors
   if (!empty($result['error'])) {
-    Civi::log()->warning(E::ts("'AivlPetition.sign': {$result['error']}"));
+    Civi::log()->warning(E::ts("'AivlBasic.signup': {$result['error']}"));
     return civicrm_api3_create_error(E::ts("Error while doing a basic signup: {$result['error']}"));
   }
   // return results
-  return civicrm_api3_create_success(E::ts("Signed {$result['counter_signed']} petitions, {$result['counter_already']} were already signed."));
+  $successMessage = E::ts("Webform basic signup");
+  if (isset($params['aivl_signup_source']) && !empty($params['aivl_signup_source'])) {
+    $successMessage .= E::ts(" for ") . $params['aivl_signup_source'];
+  }
+  $successMessage .= E::ts(" submitted succesfully");
+  return civicrm_api3_create_success($successMessage, $params, "AivlBasic", "signup");
 }

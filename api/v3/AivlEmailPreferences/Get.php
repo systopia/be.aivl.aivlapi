@@ -16,7 +16,8 @@ function _civicrm_api3_aivl_email_preferences_Get_spec(&$spec) {
     'description' => E::ts('Contact Hash'),
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_STRING,
-  ];}
+  ];
+}
 
 /**
  * AivlEmailPreferences.Get API
@@ -28,5 +29,19 @@ function _civicrm_api3_aivl_email_preferences_Get_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_aivl_email_preferences_Get($params) {
-  return CRM_Aivlapi_EmailPreferencesProcessor::get(trim(stripslashes(strip_tags($params['hash']))));
+  // preprocess incoming call
+  CRM_Aivlapi_Processor::preprocessCall($params, 'AivlEmailPreferences.get');
+  // resolve contact_id
+  CRM_Aivlapi_Processor::resolveContact($params);
+  // run through processor
+  $result = CRM_Aivlapi_EmailPreferencesProcessor::get($params);
+  // handle errors
+  if (!empty($result['error'])) {
+    Civi::log()->warning(E::ts("'AivlEmailPreferences.get': {$result['error']}"));
+    return civicrm_api3_create_error(E::ts("Error while getting Email Preferences: {$result['error']}"));
+  }
+  // return results
+  return $result;
+
 }
+

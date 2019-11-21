@@ -74,8 +74,20 @@ class CRM_Aivlapi_Processor {
     if (empty($params['contact_type'])) {
       $params['contact_type'] = 'Individual';
     }
-    $contact_match = civicrm_api3('Contact', 'getorcreate', $params);
-    $params['contact_id'] = $contact_match['id'];
+    // if hash is in parameters, use that to get contactId
+    if (isset($params['hash']) && !empty($params['hash'])) {
+      try {
+        $params['contact_id'] = civicrm_api3('Contact', 'getvalue', [
+          'hash' => $params['hash'],
+          'return' => 'id',
+        ]);
+      }
+      catch (CiviCRM_API3_Exception $ex) {
+      }
+    } else {
+      $contact_match = civicrm_api3('Contact', 'getorcreate', $params);
+      $params['contact_id'] = $contact_match['id'];
+    }
   }
 
   /**
