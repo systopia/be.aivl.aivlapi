@@ -175,6 +175,11 @@ function aivlapi_civicrm_alterAPIPermissions($entity, $action, &$params, &$permi
   $permissions['aivl_membership']['feedback']       = array('access AIVL API');
   $permissions['aivl_selfservice']['contactdata']   = array('access AIVL API');
   $permissions['aivl_selfservice']['contactbyhash'] = array('access AIVL API');
+  // AIVL Basic Signup form permissions
+  $permissions['aivl_basic']['signup'] = array('access AIVL API');
+  // Permission for AIVL Email Preferences
+  $permissions['aivl_email_preferences']['get'] = array('access AIVL API');
+  $permissions['aivl_email_preferences']['set'] = array('access AIVL API');
 
   // open these calls up to "OR 'access AIVL API'":
   $permissions['event']['get'] = array($permissions['event']['get'], 'access AIVL API');
