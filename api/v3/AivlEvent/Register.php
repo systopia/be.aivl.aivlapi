@@ -24,6 +24,9 @@ function civicrm_api3_aivl_event_register($params) {
   // preprocess incoming call
   CRM_Aivlapi_Processor::preprocessCall($params, 'AivlEvent.register');
 
+  // issue 5669 - process street numbers if present
+  CRM_Aivlapi_Processor::processStreetNumbers($params);
+
   // resolve contact
   CRM_Aivlapi_Processor::resolveContact($params);
 

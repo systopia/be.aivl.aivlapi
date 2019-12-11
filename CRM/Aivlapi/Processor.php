@@ -91,6 +91,20 @@ class CRM_Aivlapi_Processor {
   }
 
   /**
+   * Issue 5669 - sending form might have street_numbers that have to be added to the street address
+   *
+   * @param $params
+   */
+  public static function processStreetNumbers(&$params) {
+    if (isset($params['street_number'])) {
+      $params['street_address'] .= " " . trim($params['street_number']);
+    }
+    if (isset($params['organization_street_number'])) {
+      $params['organization_street_address'] .= " " . trim($params['organization_street_number']);
+    }
+  }
+
+  /**
    * Extract (and remove) all the data with a certain prefix.
    * The prefix is stripped
    *
