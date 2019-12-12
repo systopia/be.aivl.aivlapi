@@ -26,8 +26,6 @@ class CRM_Aivlapi_ParameterSanitation implements API_Wrapper {
       unset($apiRequest['params']['drop_questionmarks']);
     }
 
-    CRM_Core_Error::debug_log_message("DQ-Request: " . json_encode($apiRequest));
-
     // get the submitted parameter keys
     $keys = array_keys($apiRequest['params']);
 
@@ -49,8 +47,6 @@ class CRM_Aivlapi_ParameterSanitation implements API_Wrapper {
         unset($apiRequest['params'][$key]);
       }
     }
-
-    CRM_Core_Error::debug_log_message("DQ-Request done: " . json_encode($apiRequest));
 
     return $apiRequest;
   }
