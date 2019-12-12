@@ -26,13 +26,28 @@ class CRM_Aivlapi_ParameterSanitation implements API_Wrapper {
       unset($apiRequest['params']['drop_questionmarks']);
     }
 
-    // drop all parameters with value '?'
+    // get the submitted parameter keys
     $keys = array_keys($apiRequest['params']);
+
+    // move all 'questionmark_XXX' parameters to the suffix, if set
+    foreach ($keys as $key) {
+      if (substr($key, 0, 13) == 'questionmark_') {
+        if (isset($apiRequest['params'][$key]) && $apiRequest['params'][$key] != '?' && $apiRequest['params'][$key] != '') {
+          // move this value to the new key
+          $new_key = substr($key, 13);
+          $apiRequest['params'][$new_key] = $apiRequest['params'][$key];
+        }
+        unset($apiRequest['params'][$key]);
+      }
+    }
+
+    // drop all parameters with value '?'
     foreach ($keys as $key) {
       if ($apiRequest['params'][$key] == '?') {
         unset($apiRequest['params'][$key]);
       }
     }
+
     return $apiRequest;
   }
 
