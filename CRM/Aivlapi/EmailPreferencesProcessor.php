@@ -282,28 +282,22 @@ class CRM_Aivlapi_EmailPreferencesProcessor {
       ]);
       // by default no general information is set to 1 and all others to 0
       $this->defaultPreferencesForGet($result);
+      $newsLetter = FALSE;
+      $actionMails = FALSE;
+      $yearlyReport = FALSE;
       foreach ($apiGroupContact['values'] as $apiGroupContact) {
         switch ($apiGroupContact['group_id']) {
           // if monthly newsletter: monthly newsletter on and no general, yearly report and monthly actions off
           case $this->_monthlyNewsletterGroup['group_id']:
-            $result[$this->_monthlyNewsletterGroup['title']] = "1";
-            $result[$this->_monthlyActionsGroup['title']] = "0";
-            $result[$this->_yearlyReportGroup['title']] = "0";
-            $result[$this->_noGeneralInfo] = "0";
+            $newsLetter = TRUE;
             break;
           // if monthy actions: monthly newsletter and monthly actions on, general and yearly report off
           case $this->_monthlyActionsGroup['group_id']:
-            $result[$this->_monthlyNewsletterGroup['title']] = "1";
-            $result[$this->_monthlyActionsGroup['title']] = "1";
-            $result[$this->_yearlyReportGroup['title']] = "0";
-            $result[$this->_noGeneralInfo] = "0";
+            $actionMails = TRUE;
             break;
           // if yearly report: yearly report on and monthly newsletter, monthly actions  and general off
           case $this->_yearlyReportGroup['group_id']:
-            $result[$this->_monthlyNewsletterGroup['title']] = "0";
-            $result[$this->_monthlyActionsGroup['title']] = "0";
-            $result[$this->_yearlyReportGroup['title']] = "1";
-            $result[$this->_noGeneralInfo] = "0";
+            $yearlyReport = TRUE;
             break;
           // check if any of the specifics need setting
           default:
@@ -313,6 +307,30 @@ class CRM_Aivlapi_EmailPreferencesProcessor {
               }
             }
         }
+      }
+      if ($newsLetter && $actionMails) {
+        $result[$this->_monthlyNewsletterGroup['title']] = "1";
+        $result[$this->_monthlyActionsGroup['title']] = "1";
+        $result[$this->_yearlyReportGroup['title']] = "0";
+        $result[$this->_noGeneralInfo] = "0";
+      }
+      elseif ($newsLetter && !$actionMails) {
+        $result[$this->_monthlyNewsletterGroup['title']] = "1";
+        $result[$this->_monthlyActionsGroup['title']] = "0";
+        $result[$this->_yearlyReportGroup['title']] = "0";
+        $result[$this->_noGeneralInfo] = "0";
+      }
+      elseif ($yearlyReport && !$newsLetter && !$actionMails) {
+        $result[$this->_monthlyNewsletterGroup['title']] = "0";
+        $result[$this->_monthlyActionsGroup['title']] = "0";
+        $result[$this->_yearlyReportGroup['title']] = "1";
+        $result[$this->_noGeneralInfo] = "0";
+      }
+      elseif (!$yearlyReport && !$newsLetter && !$actionMails) {
+        $result[$this->_monthlyNewsletterGroup['title']] = "0";
+        $result[$this->_monthlyActionsGroup['title']] = "0";
+        $result[$this->_yearlyReportGroup['title']] = "0";
+        $result[$this->_noGeneralInfo] = "1";
       }
     }
     catch (CiviCRM_API3_Exception $ex) {
