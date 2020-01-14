@@ -309,7 +309,7 @@ class CRM_Aivlapi_EmailPreferencesProcessor {
         }
       }
       if ($newsLetter && $actionMails) {
-        $result[$this->_monthlyNewsletterGroup['title']] = "1";
+        $result[$this->_monthlyNewsletterGroup['title']] = "0";
         $result[$this->_monthlyActionsGroup['title']] = "1";
         $result[$this->_yearlyReportGroup['title']] = "0";
         $result[$this->_noGeneralInfo] = "0";
