@@ -44,6 +44,18 @@ class CRM_Aivlapi_ParameterSanitation implements API_Wrapper {
     // drop all parameters with value '?'
     foreach ($keys as $key) {
       if ($apiRequest['params'][$key] == '?') {
+        // we want to unset this parameter, but what if we bypassed a 'required' parameter with the '?'
+        //  and now removing it would trip up the target code? This here is happening _after_
+        //  validation but _before_ execution.
+        //  Therefore, wo would like to throw an exception, if this violates the parameter specs
+        $fields = $this->getEntityActionFields($apiRequest['entity'], $apiRequest['action']);
+        if (isset($fields[strtolower($key)])) {
+          $field_spec = $fields[strtolower($key)];
+          if (!empty($field_spec['api.required']) || !empty($field_spec['required'])  || !empty($field_spec['is_required'])) {
+            // this would delete/unset a required parameter -> we don't want that.
+            throw new API_Exception("Mandatory key(s) missing from params array: " . $key);
+          }
+        }
         unset($apiRequest['params'][$key]);
       }
     }
@@ -56,5 +68,29 @@ class CRM_Aivlapi_ParameterSanitation implements API_Wrapper {
    */
   public function toApiOutput($apiRequest, $result) {
     return $result;
+  }
+
+    /**
+     * Helper function to return cached entity action fields
+     *
+     * @param string $entity
+     *      the API entity
+     *
+     * @param string $action
+     *      the API entity
+     *
+     * @return array
+     *      list of parameter => specs option
+     *
+     * @throws Exception
+     *      in the unlikely event that the API getfields call fails
+     */
+  protected function getEntityActionFields($entity, $action) {
+      static $field_spec_cache = [];
+      if (!isset($field_spec_cache[$entity][$action])) {
+          $field_specs = civicrm_api3($entity, 'getfields', ['api_action' => $action]);
+          $field_spec_cache[$entity][$action] = $field_specs['values'];
+      }
+      return $field_spec_cache[$entity][$action];
   }
 }
