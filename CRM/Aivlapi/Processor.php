@@ -33,6 +33,13 @@ class CRM_Aivlapi_Processor {
 
     // resolve any custom fields
     CRM_Aivlapi_CustomData::resolveCustomFields($params);
+
+    // trim all values to remove unwanted spaces
+    foreach ($params as $paramKey => $paramValue) {
+      if (!is_array($paramValue)) {
+        $params[$paramKey] = trim($paramValue);
+      }
+    }
   }
 
   /**
